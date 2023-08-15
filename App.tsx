@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import React, { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
+import Skeleton from './src/components/Skeleton';
 
 const vpWidth = Dimensions.get('window').width;
 const limit = 10;
@@ -62,20 +63,18 @@ const App = () => {
 
 
     return (
-      // <View >
-      <TouchableOpacity style={{ flex: 1 }} onPress={openModal(item)}>
-        <Image
-          source={{ uri: item.thumbnail }}
-          resizeMode="cover"
-          style={{
-            width: '100%',
-            height: 200,
-          }}
-        />
+            <TouchableOpacity style={{ flex: 1, }} onPress={openModal(item)}>
+       
+            <Image
+            source={{ uri: item.thumbnail }}
+            resizeMode="cover"
+            style={{
+              width: '100%',
+              height: 200,
+            }}
+          />
       </TouchableOpacity>
-
-
-      // </View>
+       
     );
   }, []);
 
@@ -93,12 +92,23 @@ const App = () => {
   }, [loadMore, getData]);
 
   const listFooterComponent = useCallback(() => {
-    return <ActivityIndicator style={{ marginVertical: 20 }} size="large" />;
+
+   
+      return (
+        <View style={{ flex:1, flexDirection:'row'}}>
+          <Skeleton height={200} width={180} style={{   }} />
+          <Skeleton height={200} width={180} style={{   }} />
+        </View>
+      )
+    
   }, []);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View>
+
+        
+
         <FlatList
           data={imageData}
           renderItem={renderItem}
