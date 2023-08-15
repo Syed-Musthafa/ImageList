@@ -37,7 +37,6 @@ const App = () => {
     axios
       .get('https://dummyjson.com/products' + query)
       .then(res => {
-        console.log(res.data);
         if (res.data.products.length === 0) {
           setLoadMore(false);
         }
@@ -50,7 +49,6 @@ const App = () => {
       });
   };
 
-  // console.log('imageData', imageData);
 
   const openModal = useCallback((item) => () => {
     setModalVisible(true)
