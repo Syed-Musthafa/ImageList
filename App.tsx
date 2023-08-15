@@ -7,8 +7,10 @@ import {
   View,
   Dimensions,
   ActivityIndicator,
+  Modal,
+  TouchableOpacity,
 } from 'react-native';
-import React, {useCallback, useEffect, useState} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 
 const vpWidth = Dimensions.get('window').width;
@@ -19,6 +21,9 @@ const App = () => {
   const [next, setNext] = useState<number>(0);
   const [loadMore, setLoadMore] = useState<boolean>(true);
   const [showLoader, setShowLoader] = useState<boolean>(false);
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+
+  const [img, setImg] = useState()
 
 
   useEffect(() => {
@@ -40,37 +45,44 @@ const App = () => {
         setShowLoader(false)
       })
       .catch(err => {
-        console.log(err);
+        console.log("list",err);
       });
   };
 
-  console.log('imageData', imageData);
+  // console.log('imageData', imageData);
 
-  const renderItem = useCallback(({item, index}) => {
-    // let min = 50;
-    // let max = 200;
+  const openModal = useCallback((item) => () => {
+    setModalVisible(true)
+    setImg(item.thumbnail)
+  }, [modalVisible, img])
 
-    // let img_height = Math.floor(Math.random() * (max - min + 1)) + min;
+
+
+  const renderItem = useCallback(({ item, index }) => {
+
 
     return (
-      <View style={{flex: 1}}>
+      // <View >
+      <TouchableOpacity style={{ flex: 1 }} onPress={openModal(item)}>
         <Image
-          source={{uri: item.thumbnail}}
+          source={{ uri: item.thumbnail }}
           resizeMode="cover"
           style={{
             width: '100%',
             height: 200,
-            // height: parseInt(Math.max(0.5, Math.random()) * vpWidth),
           }}
         />
-      </View>
+      </TouchableOpacity>
+
+
+      // </View>
     );
   }, []);
 
   const keyExtractor = useCallback(item => `${item.id}`, []);
 
   const itemSeparatorComponent = useCallback(() => {
-    return <View style={{height: 20}} />;
+    return <View style={{ height: 20 }} />;
   }, []);
 
   const onEndReached = useCallback(() => {
@@ -81,11 +93,11 @@ const App = () => {
   }, [loadMore, getData]);
 
   const listFooterComponent = useCallback(() => {
-    return <ActivityIndicator style={{marginVertical: 20}} size="large" />;
+    return <ActivityIndicator style={{ marginVertical: 20 }} size="large" />;
   }, []);
 
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{ flex: 1 }}>
       <View>
         <FlatList
           data={imageData}
@@ -97,10 +109,65 @@ const App = () => {
           ListFooterComponent={showLoader && listFooterComponent}
         />
       </View>
+
+      <View>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            setModalVisible(!modalVisible);
+          }}
+        >
+          <TouchableOpacity style={styles.centeredView} activeOpacity={1}
+            onPress={() => {
+              setModalVisible(false);
+            }}>
+            <View style={styles.modalView}>
+              <Image
+                source={{ uri: img }}
+                resizeMode="stretch"
+                style={{
+                  width: '100%',
+                  height: 300,
+                  borderRadius: 20
+                }}
+              />
+            </View>
+          </TouchableOpacity>
+        </Modal>
+
+      </View>
+
+
     </SafeAreaView>
   );
 };
 
 export default App;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    // marginTop: 22,
+    backgroundColor: 'rgba(52, 52, 52, 0.8)'
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 5,
+    width: "90%",
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+});
